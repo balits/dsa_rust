@@ -1,41 +1,35 @@
-#[allow(dead_code)]
-pub fn merge_sort<T>(slice: &mut [T])
-where
-    T: PartialOrd + Copy,
-{
-    if slice.len() < 2 {
+use std::usize;
+
+pub fn quicksort<T: PartialOrd>(slice: &mut [T]) {
+    let len = slice.len();
+    if len < 2 {
         return;
     }
-    let mid = slice.len() / 2;
 
-    merge_sort(&mut slice[..mid]);
-    merge_sort(&mut slice[mid..]);
+    let p = lomuto_partition(slice);
+    quicksort(&mut slice[..p]);
+    quicksort(&mut slice[p + 1..]);
+}
 
+fn lomuto_partition<T: PartialOrd>(slice: &mut [T]) -> usize {
     let len = slice.len();
-    let (mut i, mut j) = (0, mid);
-    let mut result = Vec::with_capacity(len);
+    let pivot_idx = len - 1;
+    let mut i = 0;
 
-    while i < mid && j < len {
-        if slice[i] < slice[j] {
-            result.push(slice[i]);
+    for j in 0..len - 1 {
+        if slice[j] <= slice[pivot_idx] {
+            slice.swap(i, j);
             i += 1;
-        } else {
-            result.push(slice[j]);
-            j += 1;
         }
     }
 
-    if i < mid {
-        result.extend_from_slice(&slice[i..mid]);
-    } else if j < len {
-        result.extend_from_slice(&slice[j..len]);
-    }
-
-    slice.copy_from_slice(&result[..]);
+    slice.swap(i, len - 1);
+    i
 }
+
 #[cfg(test)]
 mod tests {
-    use super::merge_sort as sort;
+    use super::quicksort as sort;
 
     #[test]
     fn test_sort_empty() {
