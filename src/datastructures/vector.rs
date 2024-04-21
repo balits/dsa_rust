@@ -15,15 +15,19 @@ pub struct Vector<T> {
     len: usize,
 }
 
+#[allow(unused)]
 impl<T> Vector<T> {
     pub fn capacity(&self) -> usize {
         self.cap
     }
+
     pub fn len(&self) -> usize {
         self.len
     }
+
     pub fn new() -> Self {
         assert!(mem::size_of::<T>() != 0, "We're not ready to handle ZSTs");
+
         Self {
             ptr: None,
             cap: 0,
