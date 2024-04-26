@@ -1,12 +1,16 @@
+#![allow(dead_code)]
+
+use core::panic;
 use std::{
     borrow::Borrow,
     hash::{DefaultHasher, Hash, Hasher},
+    ops::Index,
 };
 
 const INIT_BUCKETS: usize = 4;
 
 pub struct HashMap<K, V> {
-    buckets: Vec<Vec<(K, V)>>,
+    pub(crate) buckets: Vec<Vec<(K, V)>>,
     items: usize,
 }
 
@@ -130,8 +134,22 @@ where
     }
 }
 
+impl<K, V, Q> Index<&Q> for HashMap<K, V>
+where
+    Q: Hash + Eq + ?Sized,
+    K: Hash + Eq + Borrow<Q>,
+{
+    type Output = V;
+    fn index(&self, index: &Q) -> &Self::Output {
+        match self.get(index) {
+            Some(v) => v,
+            None => panic!("Key not present in HashMap"),
+        }
+    }
+}
+
 mod test {
-    use crate::HashMap;
+    use super::HashMap;
 
     #[test]
     fn insert() {
@@ -194,7 +212,7 @@ mod test {
         }
 
         // Look up the value for a key (will panic if the key is not found).
-        // println!("Review for Jane: {}", book_reviews["Pride and Prejudice"]);
+        println!("Review for Jane: {}", book_reviews["Pride and Prejudice"]);
 
         // Iterate over everything.
         for (book, review) in &book_reviews {
